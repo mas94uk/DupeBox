@@ -19,7 +19,7 @@ where
 - `--worst` shows you the worst offenders (most duplicates) first
 - `filename` is the name of the rdfind output. Defaults to results.txt if omitted.
 
-The program will display, for each group of duplicate pictures, the picture a button per duplicate file. Press one or more of the buttons to mark files for deletion. Keyboard shortcuts (<kbd>1</kbd>..<kbd>Ctrl</kbd> and <kbd>a</kbd>...) are also provided for expediency.
+The program will display, for each group of duplicate pictures, the picture a button per duplicate file. Press one or more of the buttons to mark files for deletion. Keyboard shortcuts (<kbd>1</kbd>..<kbd>9</kbd> and <kbd>a</kbd>...) are also provided for expediency.
 
 The program outputs a file (`delete.txt`) containing `rm` commands for each file marked for deletion. You can perform the deletion using, for example, `source deletes.txt`.
 

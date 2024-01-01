@@ -8,6 +8,9 @@ WINDOW_WIDTH = 900
 THUMBNAIL_SIZE = 600
 
 class PicWindow(Frame):
+
+    SUPPORTED_FORMATS = ("jpg", "jpeg", "png", "gif")
+
     def __init__(self, filenames, master=None):
         Frame.__init__(self, master)
 

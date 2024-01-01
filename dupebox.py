@@ -88,26 +88,23 @@ with open("delete.txt", "w")  as delete_file:
             if not os.path.isfile(filename):
                 all_present = False
 
+        first_filename = record[0]
         if not all_present:
-            print(f"Skipping {record[0]} (et al) as one or more duplicate files missing")
+            print(f"Skipping {first_filename} (et al) as one or more duplicate files missing")
             continue
 
         # Currently only process JPGs. Maybe add other formats later.
-        supported = True
-        for filename in record:
-            stem, ext = os.path.splitext(filename)
-            ext = ext.lower()
-            if not (ext==".jpg" or ext==".jpeg"):
-                supported = False
-
-        if not supported:
-            print(f"Skipping {record[0]} (et al) as extension {ext} not supported")
+        # We will assume the extension of the first file is correct and represents that of the other files.
+        stem, ext = os.path.splitext(first_filename)
+        ext = ext.lower().lstrip(".")
+        if ext in PicWindow.SUPPORTED_FORMATS:
+            # Offer them to the user
+            root = Tk()
+            app = PicWindow(record, root)
+            root.mainloop()
+        else:
+            print(f"Skipping {first_filename} (et al) as extension {ext} not supported")
             continue
-
-        # Offer them to the user
-        root = Tk()
-        app = PicWindow(record, root)
-        root.mainloop()
 
         # Get the results
         files_to_delete = app.results

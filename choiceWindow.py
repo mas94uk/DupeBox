@@ -1,20 +1,25 @@
 #!/usr/bin/python3
 
-from tkinter import *
-from PIL import Image, ImageTk
+from tkinter import Frame, Button, BOTH, Label
+from PIL import ImageTk
 from tkinter import messagebox
 
 WINDOW_WIDTH = 900
 THUMBNAIL_SIZE = 600
 
-class PicWindow(Frame):
+class ChoiceWindow(Frame):
+    """
+    Show the given picture and buttons for the given filenames, to let the user choose a set of 0 or more filenames.
 
-    SUPPORTED_FORMATS = ("jpg", "jpeg", "png", "gif")
-
-    def __init__(self, filenames, master=None):
+    When complete, self, results will either be:
+      None -- if user wants to exit, or
+      A list of selected filenames (which may be empty)
+    """
+    def __init__(self, picture, filenames, master=None):
         Frame.__init__(self, master)
 
         self.filenames = filenames
+        self.results = None
 
         self.master = master
         self.master.title("Select file(s) to delete, ESC to cancel, Enter to finish this file, Q to quit")
@@ -23,9 +28,8 @@ class PicWindow(Frame):
         # List of indices which have been selected
         self.selected = []
 
-        # Show the picture
+        # Resize and show the picture
         y = 10
-        picture = Image.open(filenames[0])
         picture.thumbnail(size=(THUMBNAIL_SIZE, THUMBNAIL_SIZE))
         tk_picture = ImageTk.PhotoImage(picture)
         pic_label = Label(image=tk_picture)
@@ -114,5 +118,3 @@ class PicWindow(Frame):
                     return
             self.buttons[index].configure(bg="gray")
             self.selected.append(index)
-
-    

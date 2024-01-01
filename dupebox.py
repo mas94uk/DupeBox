@@ -1,11 +1,17 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 # Display duplicate files, as found by 'rdfind', for user to select files to delete.
+import cv2
 import os
+from PIL import Image
+# from PIL.Image import fromarray
 import random
 import sys
-from picwindow import PicWindow
-from tkinter import *
+from choiceWindow import ChoiceWindow
+from tkinter import Tk
+
+SUPPORTED_PICTURE_FORMATS = ("jpg", "jpeg", "png", "gif")
+SUPPORTED_VIDEO_FORMATS = ("mp4", "mpg", "mov")
 
 args = sys.argv[1:]
 
@@ -93,17 +99,43 @@ with open("delete.txt", "w")  as delete_file:
             print(f"Skipping {first_filename} (et al) as one or more duplicate files missing")
             continue
 
-        # Currently only process JPGs. Maybe add other formats later.
         # We will assume the extension of the first file is correct and represents that of the other files.
         stem, ext = os.path.splitext(first_filename)
         ext = ext.lower().lstrip(".")
-        if ext in PicWindow.SUPPORTED_FORMATS:
-            # Offer them to the user
+        picture = None
+        if ext in SUPPORTED_PICTURE_FORMATS:
+            # Load the picture
+            picture = Image.open(first_filename)
+        elif ext in SUPPORTED_VIDEO_FORMATS:
+            # Open the video
+            video = cv2.VideoCapture(first_filename)
+
+            # Create thumbnails
+            frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+            if frame_count > 5:
+                # Get frames from near start, middle and near end
+                frame_numbers = (1, int((frame_count-1)/2), frame_count-2)
+            else:
+                # Just use middle frame
+                frame_numbers = ( int((frame_count-1)/2) )
+            frames = []
+            for frame_number in frame_numbers:
+                video.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
+                ret, frame = video.read()
+                if ret:
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    frames.append(frame)
+            video.release()
+            frame = cv2.hconcat(frames)
+            picture = Image.fromarray(frame)
+        
+        if picture is not None:
+            # Show picture and choices to the user
             root = Tk()
-            app = PicWindow(record, root)
+            app = ChoiceWindow(picture, record, root)
             root.mainloop()
         else:
-            print(f"Skipping {first_filename} (et al) as extension {ext} not supported")
+            print(f"Skipping {first_filename} (et al) as extension {ext} could not be loaded")
             continue
 
         # Get the results
